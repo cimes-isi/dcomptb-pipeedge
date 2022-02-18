@@ -1,4 +1,5 @@
 #!/bin/bash
-sudo apt --allow-releaseinfo-change update || exit $?
-sudo apt upgrade -y || exit $?
-sudo apt install -y build-essential cmake pkg-config || exit $?
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get --allow-releaseinfo-change update || exit $?
+sudo apt-get -q -y upgrade || exit $?
+sudo apt-get -q -y install build-essential cmake git pkg-config || exit $?
