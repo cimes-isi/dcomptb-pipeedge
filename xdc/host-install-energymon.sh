@@ -6,5 +6,5 @@ cd energymon/_build || exit $?
 git checkout -q v0.4.0 || exit $?
 cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENERGYMON_BUILD_DEFAULT=energymon-raplcap-msr || exit $?
 make -j || exit $?
-sudo make install || exit $?
+sudo make -j install || exit $?
 sudo ldconfig || exit $?
