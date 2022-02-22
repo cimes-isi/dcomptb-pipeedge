@@ -8,4 +8,4 @@ NPROC=$(nproc)
 for (( i=0; i<NPROC; i++ )); do
   sudo chmod go+rw "/dev/cpu/${i}/msr_safe" || exit $?
 done
-sudo sh -c 'cat raplcap/msr/etc/msr_safe_allowlist >> /dev/cpu/msr_allowlist'
+cat raplcap/msr/etc/msr_safe_allowlist | sudo tee -a /dev/cpu/msr_allowlist > /dev/null
