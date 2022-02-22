@@ -57,8 +57,6 @@ parallel-ssh -h hosts.txt -i hostname
 
 Install system package dependencies:
 
-TODO: This fails b/c it hangs on Grub on RCC-VE devices - can we ignore grub-pc/grub2?
-
 ```sh
 parallel-ssh -h hosts.txt -i -t 1200 -I < ./host-install-packages.sh
 ```
