@@ -23,70 +23,44 @@ sudo chown -R $USER:$USER ~/.ansible
 ANSIBLE_HOST_KEY_CHECKING=False xdc ansible ping
 ```
 
-
-## Install XDC Dependencies
-
-Install package dependencies:
+Configure the ansible inventory and test that you can execute commands on the hosts in the experiment (by having them print their hostnames):
 
 ```sh
-sudo apt install -y git pssh
+xdc ansible inventory | sudo tee -a /etc/ansible/hosts > /dev/null
+ansible all -a hostname
 ```
 
-Fetch this repository and change to its `xdc` directory:
+Install XDC package dependencies:
+
+```sh
+sudo apt-get install -y git
+```
+
+Fetch this repository and change to its `xdc/ansible/` directory:
 
 ```sh
 git clone https://github.com/cimes-isi/dcomptb-edgepipe.git
-cd dcomptb-edgepipe/xdc/
-```
-
-Create a `hosts.txt` file with the hostnames in the experiment.
-For example, you can parse from the inventory:
-
-```sh
-xdc ansible inventory | awk '/\[/{prefix=$0; next} $1{print prefix $0}' | grep "\[all\]" | cut -d']' -f2 > hosts.txt
-```
-
-Then test that you can execute commands on hosts in the experiment:
-
-```sh
-parallel-ssh -h hosts.txt -i -- hostname
+cd dcomptb-edgepipe/xdc/ansible/
 ```
 
 
 ## Install Worker Dependencies
 
-Install system package dependencies:
+Update package dependencies (necessary to get a kernel for which headers are available):
 
 ```sh
-parallel-ssh -h hosts.txt -i -t 1200 -I < ./host-install-packages.sh
+ansible-playbook apt-upgrade.yml
 ```
 
-Note: Installing packages may take several minutes.
-If apt/dpkg have problems, fix them manually before proceeding.
-The above command may be safely re-run.
-
-Now reboot the devices to load newer kernels for which headers are actually available:
-
-```sh
-parallel-ssh -h hosts.txt -- sudo reboot
-```
-
-Ignore any "Exited with error code 255" messages.
-Wait a few minutes until you can ping all devices successfully:
-
-```sh
-xdc ansible ping
-```
+Devices may reboot as part of the upgrade.
 
 Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`):
 
 ```sh
-parallel-ssh -h hosts.txt -i -t 300 -I < ./host-install-msr-safe.sh
-parallel-ssh -h hosts.txt -i -t 300 -I < ./host-install-raplcap.sh
-parallel-ssh -h hosts.txt -i -t 300 -I < ./host-install-energymon.sh
+ansible-playbook install-msr-safe.yml
+ansible-playbook install-raplcap.yml
+ansible-playbook install-energymon.yml
 ```
-
-You may safely ignore CMake warnings from energymon about "skipping this project".
 
 
 ## Initialize Worker Environment
@@ -95,8 +69,9 @@ These scripts initialize the environment and must be re-run if hosts are reboote
 It is safe to re-run them as long as the dependencies above are complete.
 
 Load the `msr-safe` kernel module:
+
 ```sh
-parallel-ssh -h hosts.txt -i -I < ./host-load-msr-safe.sh
+ansible-playbook load-msr-safe.yml
 ```
 
 ### Smoke Test(s)
@@ -104,5 +79,5 @@ parallel-ssh -h hosts.txt -i -I < ./host-load-msr-safe.sh
 Test that RAPL energy monitoring is working properly:
 
 ```sh
-parallel-ssh -h hosts.txt -i -- rapl-configure-msr
+ansible all -a rapl-configure-msr
 ```
