@@ -1,0 +1,30 @@
+- name: Install msr-safe
+  hosts: all
+
+  vars:
+    source_dir: msr-safe
+    version: v1.6.0
+
+  tasks:
+
+  - name: Install apt dependencies
+    become: yes
+    apt:
+      name:
+        - build-essential
+        - git
+        - linux-headers-{{ansible_kernel}}
+
+  - name: Fetch source
+    ansible.builtin.git:
+      repo: 'https://github.com/LLNL/msr-safe.git'
+      dest: "{{source_dir}}"
+      version: "{{version}}"
+    register: source
+
+  - name: Compile
+    ansible.builtin.command:
+      chdir: "{{source_dir}}"
+      argv:
+        - make
+    when: source.changed

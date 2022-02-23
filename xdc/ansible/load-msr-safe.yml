@@ -1,0 +1,46 @@
+- name: Load msr-safe kernel module
+  hosts: all
+
+  vars:
+    kmod: msr-safe/msr-safe.ko
+    rapl_allowlist: raplcap/msr/etc/msr_safe_allowlist
+
+  tasks:
+
+  - name: Check for existing allowlist
+    ansible.builtin.stat:
+      path: /dev/cpu/msr_allowlist
+    register: msr_allowlist_file
+
+  - name: Load kernel module
+    become: yes
+    ansible.builtin.command:
+      argv:
+        - insmod
+        - "{{kmod}}"
+    when: not msr_allowlist_file.stat.exists
+
+  # this is safe to re-run
+  - name: Add RAPL registers to allowlist
+    become: yes
+    shell:
+      cmd: cat {{rapl_allowlist}} >> /dev/cpu/msr_allowlist
+    when: not msr_allowlist_file.stat.exists
+
+  - name: Identify CPU device directories
+    find:
+      paths: /dev/cpu
+      file_type: any
+      patterns: "[0-9]+"
+      use_regex: yes
+    register: cpudevs
+    when: not msr_allowlist_file.stat.exists
+
+  # this is safe to re-run
+  - name: Relax msr_safe permissions
+    become: yes
+    ansible.builtin.file:
+      path: "{{item}}/msr_safe"
+      mode: go+rw
+    loop: "{{cpudevs.files|map(attribute='path')|list}}"
+    when: not msr_allowlist_file.stat.exists

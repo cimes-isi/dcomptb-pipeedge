@@ -1,0 +1,88 @@
+- name: Install EnergyMon
+  hosts: all
+
+  vars:
+    source_dir: energymon
+    build_dir: "{{source_dir}}/_build"
+    # TODO: use v0.5.0 once released w/ jetson support (for consistency w/ CHI@Edge)
+    version: v0.4.0
+    shared_libs: ON
+    build_type: RelWithDebInfo
+    energymon_default: energymon-raplcap-msr
+
+  tasks:
+
+  - name: Install apt dependencies
+    apt:
+      name:
+        - build-essential
+        - cmake
+        - git
+        - pkg-config
+
+  - name: Fetch source
+    ansible.builtin.git:
+      repo: 'https://github.com/energymon/energymon.git'
+      dest: "{{source_dir}}"
+      version: "{{version}}"
+    register: source
+
+  - name: Create build directory
+    ansible.builtin.command:
+      argv:
+        - cmake
+        - -S
+        - "{{source_dir}}"
+        - -B
+        - "{{build_dir}}"
+        - -DBUILD_SHARED_LIBS={{shared_libs}}
+        - -DCMAKE_BUILD_TYPE={{build_type}}
+        - -DENERGYMON_BUILD_DEFAULT={{energymon_default}}
+    args:
+      creates: "{{build_dir}}"
+    when: source.changed
+
+  - name: Check for install manifest
+    ansible.builtin.stat:
+      path: "{{build_dir}}/install_manifest.txt"
+    register: install_manifest_file
+    when: source.changed
+
+  - name: Uninstall
+    become: yes
+    ansible.builtin.command:
+      argv:
+        - cmake
+        - --build
+        - "{{build_dir}}"
+        - -j
+        - --target
+        - uninstall
+    when: (source.changed) and (install_manifest_file.stat.exists)
+
+  - name: Compile
+    ansible.builtin.command:
+      argv:
+        - cmake
+        - --build
+        - "{{build_dir}}"
+        - -j
+    when: source.changed
+
+  - name: Install
+    become: yes
+    ansible.builtin.command:
+      argv:
+        - cmake
+        - --build
+        - "{{build_dir}}"
+        - -j
+        - --target
+        - install
+    when: source.changed
+
+  - name: Run ldconfig
+    become: yes
+    ansible.builtin.command:
+      argv: ldconfig
+    when: source.changed
