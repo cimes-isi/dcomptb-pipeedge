@@ -25,6 +25,7 @@
         - apt-get
         - --allow-releaseinfo-change
         - update
+      warn: false
 
   # dist-upgrade is apparently needed to get kernel updates (maybe since we're blocking grub)
   - name: Apt dist-upgrade
