@@ -1,0 +1,86 @@
+- name: Install EdgePipe
+  hosts: all
+
+  vars:
+    # ansible_python_interpreter: /usr/bin/python3
+    source_dir: EdgePipe
+    version: main
+    models_dir_local: /tmp/edgepipe/models
+    models_dir: models
+    venv_dir: venv-EdgePipe
+
+  tasks:
+
+  - name: Create models directory on controller
+    local_action:
+      module: ansible.builtin.file
+      path: "{{ models_dir_local }}"
+      state: directory
+    run_once: true
+
+  - name: Download models to controller
+    local_action:
+      module: ansible.builtin.get_url
+      url: "{{ item.url }}"
+      dest: "{{ models_dir_local }}/{{ item.file }}"
+    loop:
+      # Explicitly specifying a file rather than just the dest directory avoids
+      # downloading the large files every time this task is invoked.
+      - { url: 'https://storage.googleapis.com/vit_models/imagenet21k%2Bimagenet2012/ViT-B_16-224.npz', file: 'ViT-B_16-224.npz' }
+      - { url: 'https://storage.googleapis.com/vit_models/imagenet21k%2Bimagenet2012/ViT-L_16-224.npz', file: 'ViT-L_16-224.npz' }
+      - { url: 'https://storage.googleapis.com/vit_models/imagenet21k/ViT-H_14.npz', file: 'ViT-H_14.npz' }
+    run_once: true
+
+  - name: Install apt dependencies
+    become: yes
+    apt:
+      name:
+        - git
+        - python3-pip
+        - python3-setuptools
+        - python3-venv
+
+  - name: Fetch source
+    ansible.builtin.git:
+      accept_hostkey: yes
+      repo: 'git@github.com:cimes-isi/EdgePipe.git'
+      dest: "{{ source_dir }}"
+      version: "{{ version }}"
+    register: source
+
+  - name: Copy models from controller to hosts
+    ansible.builtin.copy:
+      src: "{{ models_dir_local }}/"
+      dest: "{{ models_dir }}/"
+      force: no
+
+  # TODO: too many problems with pip module...
+  # - name: Create Python virtualenv
+  #   ansible.builtin.pip:
+  #     # need latest for dependencies to correctly compile
+  #     state: latest
+  #     # this must be a full path, o/w it creates in /tmp and we get other seemingly unrelated python errors
+  #     # keep outside of the EdgePipe directory so we can manage them independently, if needed
+  #     virtualenv: "{{ ansible_env.HOME }}/venv-EdgePipe"
+  #     # virtualenv_python: "{{ ansible_python_interpreter }}"
+  #     virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  #     requirements: "{{ ansible_env.HOME }}/{{ source_dir }}/requirements.txt"
+
+  - name: Create Python virtualenv
+    ansible.builtin.command:
+      argv:
+        - python3
+        - -m
+        - venv
+        - "{{ venv_dir }}"
+    args:
+      creates: "{{ venv_dir }}"
+
+  - name: Update Python virtualenv
+    when: source.changed
+    shell: |
+      source {{ ansible_env.HOME }}/{{ venv_dir }}/bin/activate && \
+      pip install -U pip && \
+      pip install -r {{ source_dir }}/requirements.txt
+    args:
+      executable: /bin/bash
