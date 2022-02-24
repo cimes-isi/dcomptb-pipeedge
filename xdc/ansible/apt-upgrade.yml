@@ -27,7 +27,9 @@
         - update
       warn: false
 
-  # dist-upgrade is apparently needed to get kernel updates (maybe since we're blocking grub)
+  # dist-upgrade is needed to get kernel updates
+  # NOTE: apparently doesn't create /var/run/reboot-required when only the
+  # Debian revision changes (e.g., 4.19.0-11 -> 4.19.0-18)
   - name: Apt dist-upgrade
     apt:
       upgrade: dist

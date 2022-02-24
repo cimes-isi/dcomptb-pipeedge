@@ -26,6 +26,7 @@ ANSIBLE_HOST_KEY_CHECKING=False xdc ansible ping
 Configure the ansible inventory and test that you can execute commands on the hosts in the experiment (by having them print their hostnames):
 
 ```sh
+sudo cp /etc/ansible/hosts /etc/ansible/hosts.orig
 xdc ansible inventory | sudo tee -a /etc/ansible/hosts > /dev/null
 ansible all -a hostname
 ```
@@ -46,13 +47,18 @@ cd dcomptb-edgepipe/xdc/ansible/
 
 ## Install Worker Dependencies
 
-Update package dependencies (necessary to get a kernel for which headers are available):
+Update package dependencies:
 
 ```sh
 ansible-playbook apt-upgrade.yml
 ```
 
 Devices may reboot as part of the upgrade.
+If this is your initial setup and the task "Reboot if required" is skipped, then manually direct the workers to reboot (this is necessary to get a kernel for which headers are available):
+
+```sh
+ansible all -a reboot
+```
 
 Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`):
 
