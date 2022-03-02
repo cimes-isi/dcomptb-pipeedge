@@ -35,6 +35,7 @@
     become: yes
     apt:
       name:
+        - build-essential
         - git
         # - python3-pip
         # - python3-setuptools
@@ -47,6 +48,10 @@
       dest: "{{ source_dir }}"
       version: "{{ version }}"
     register: source
+
+  - name: Compile
+    when: source.changed
+    shell: g++ "{{ source_dir }}/partition/partition.cpp" -o "{{ source_dir }}/partition/partition" -O2 -L/usr/local -lcnpy -lz --std=c++17
 
   - name: Copy models from controller to hosts
     ansible.builtin.copy:
