@@ -1,0 +1,44 @@
+- name: Install cnpy
+  hosts: all
+
+  vars:
+    source_dir: cnpy
+    build_dir: "{{source_dir}}/build"
+    version: 4e8810b
+    build_type: RelWithDebInfo
+
+  tasks:
+
+  - name: Install apt dependencies
+    become: yes
+    apt:
+      name:
+        - build-essential
+        - cmake
+        - git
+        - zlib1g-dev
+
+  - name: Fetch source
+    ansible.builtin.git:
+      repo: 'https://github.com/rogersce/cnpy.git'
+      dest: "{{ source_dir }}"
+      version: "{{ version }}"
+    register: source
+
+  - name: Compile
+    when: source.changed
+    shell: |
+      cmake -S {{ source_dir }} -B {{ build_dir }} -DENABLE_STATIC=OFF -DCMAKE_BUILD_TYPE={{ build_type }} && \
+      cmake --build {{ build_dir }} -j
+
+  - name: Install
+    when: source.changed
+    become: yes
+    # /usr/local/lib/libcnpy.so
+    # /usr/local/include/cnpy.h
+    # /usr/local/bin/mat2npz
+    # /usr/local/bin/npy2mat
+    # /usr/local/bin/npz2mat
+    shell: |
+      cmake --build {{ build_dir }} -j --target install && \
+      ldconfig
