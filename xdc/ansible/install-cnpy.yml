@@ -25,20 +25,37 @@
       version: "{{ version }}"
     register: source
 
-  - name: Compile
+  - name: Create build directory
+    command: cmake -S "{{ source_dir }}" -B "{{ build_dir }}" \
+             -DCMAKE_BUILD_TYPE="{{ build_type }}" \
+             -DENABLE_STATIC=OFF
+    args:
+      creates: "{{build_dir}}"
     when: source.changed
-    shell: |
-      cmake -S {{ source_dir }} -B {{ build_dir }} -DENABLE_STATIC=OFF -DCMAKE_BUILD_TYPE={{ build_type }} && \
-      cmake --build {{ build_dir }} -j
+
+  - name: Uninstall
+    become: yes
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop:
+    - /usr/local/lib/libcnpy.so
+    - /usr/local/include/cnpy.h
+    - /usr/local/bin/mat2npz
+    - /usr/local/bin/npy2mat
+    - /usr/local/bin/npz2mat
+    when: source.changed
+
+  - name: Compile
+    command: cmake --build "{{ build_dir }}" -j
+    when: source.changed
 
   - name: Install
-    when: source.changed
     become: yes
-    # /usr/local/lib/libcnpy.so
-    # /usr/local/include/cnpy.h
-    # /usr/local/bin/mat2npz
-    # /usr/local/bin/npy2mat
-    # /usr/local/bin/npz2mat
-    shell: |
-      cmake --build {{ build_dir }} -j --target install && \
-      ldconfig
+    command: cmake --build "{{ build_dir }}" -j --target install
+    when: source.changed
+
+  - name: Run ldconfig
+    become: yes
+    command: ldconfig
+    when: source.changed
