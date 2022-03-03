@@ -39,11 +39,11 @@
       path: "{{ item }}"
       state: absent
     loop:
-    - /usr/local/lib/libcnpy.so
-    - /usr/local/include/cnpy.h
-    - /usr/local/bin/mat2npz
-    - /usr/local/bin/npy2mat
-    - /usr/local/bin/npz2mat
+      - /usr/local/lib/libcnpy.so
+      - /usr/local/include/cnpy.h
+      - /usr/local/bin/mat2npz
+      - /usr/local/bin/npy2mat
+      - /usr/local/bin/npz2mat
     when: source.changed
 
   - name: Compile
