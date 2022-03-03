@@ -23,8 +23,7 @@
     register: source
 
   - name: Compile
-    ansible.builtin.command:
-      chdir: "{{source_dir}}"
-      argv:
-        - make
+    shell: make
+    args:
+      chdir: "{{ source_dir }}"
     when: source.changed
