@@ -57,7 +57,7 @@ Devices may reboot as part of the upgrade.
 If this is your initial setup and the task "Reboot if required" is skipped, then manually direct the workers to reboot (this is necessary to get a kernel for which headers are available):
 
 ```sh
-ansible all -a reboot
+ansible all -b -m reboot
 ```
 
 Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`):
