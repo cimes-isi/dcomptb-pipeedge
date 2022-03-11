@@ -1,0 +1,77 @@
+- name: EdgePipe 2-node test
+  hosts: rcc-0, rcc-1
+
+  vars:
+    fail_if_test_dir_exists: true
+
+    # device configurations
+    source_dir: "{{ ansible_env.HOME }}/EdgePipe"
+    venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
+    test_dir: "{{ ansible_env.HOME }}/test-2-nodes"
+    world_size: "{{ ansible_play_hosts | length }}"
+    master_host: "{{ ansible_play_hosts[0] }}"
+    # ... or more explicitly:
+    # ranks: # then use in task: "{{ ranks[inventory_hostname] }}"
+    #   rcc-0: 0
+    #   rcc-1: 1
+    # world_size: "{{ ranks | length }}"
+    # master_host: rcc-0
+    # model to use
+    model_name: "google/vit-base-patch16-224"
+    model_file: "{{ ansible_env.HOME }}/models/ViT-B_16-224.npz"
+    # partition strategy determined by algorithm
+    partition: "1,24,25,48"
+    # data item configurations
+    #   -b/--batch-size: total number of items
+    #   -sp/--splits: microbatch size (best if a divisor of batch size)
+    #   -n/--num-batches: an outer loop
+    # number of data transfers b/w neighboring nodes = num_batches * ceil(batch_size / splits)
+    batch_size: 48
+    microbatch_size: 12
+    num_batches: 1
+    # monitoring/actuation configuration
+    window_size: 2 # number of data (microbatch) transfers per sliding window
+
+  tasks:
+
+  - name: Check if test directory exists
+    ansible.builtin.stat:
+      path: "{{ test_dir }}"
+    register: test_dir_stat
+    when: fail_if_test_dir_exists|bool
+
+  - name: Fail if test directory exists
+    ansible.builtin.fail:
+      msg: "Test directory already exists: {{ test_dir }}"
+    when: fail_if_test_dir_exists|bool and test_dir_stat.stat.exists
+
+  - name: Create test directory
+    ansible.builtin.file:
+      path: "{{ test_dir }}"
+      state: directory
+
+  - name: Runtime
+    shell: |
+      source "{{ venv_dir }}/bin/activate" && \
+      export WINDOW_SIZE="{{ window_size }}" && \
+      python3 "{{ source_dir }}/runtime.py" \
+        "{{ ansible_play_hosts.index(inventory_hostname) }}" "{{ world_size }}" \
+        -s eth1 --addr "{{ master_host }}" \
+        -m "{{ model_name }}" -M "{{ model_file }}" -pt "{{ partition }}" \
+        -b "{{ batch_size }}" -sp "{{ microbatch_size }}" -n "{{ num_batches }}" \
+        > >(tee stdout.log) 2> >(tee stderr.log)
+    args:
+      chdir: "{{ test_dir }}"
+      executable: /bin/bash
+    async: 10000
+    poll: 0
+    register: runtime
+
+  - name: Wait for master task
+    async_status:
+      jid: "{{ runtime.ansible_job_id }}"
+    register: job_result
+    until: job_result.finished
+    delay: 30
+    retries: 60
+    when: ansible_hostname == master_host
