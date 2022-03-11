@@ -60,12 +60,14 @@ If this is your initial setup and the task "Reboot if required" is skipped, then
 ansible all -b -m reboot
 ```
 
-Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`):
+Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`, `edgepipe` depends on `cnpy`):
 
 ```sh
 ansible-playbook install-msr-safe.yml
 ansible-playbook install-raplcap.yml
 ansible-playbook install-energymon.yml
+ansible-playbook install-cnpy.yml
+ansible-playbook install-edgepipe.yml
 ```
 
 
@@ -86,4 +88,10 @@ Test that RAPL energy monitoring is working properly:
 
 ```sh
 ansible all -a rapl-configure-msr
+```
+
+Test a distributed EdgePipe execution (should take about 2 minutes):
+
+```sh
+ansible-playbook exp/test-2-nodes.yml --extra-vars "fail_if_test_dir_exists=false"
 ```
