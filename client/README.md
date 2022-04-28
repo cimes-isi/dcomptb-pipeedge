@@ -15,7 +15,7 @@ mergetb login <username>
 
 We recommend generating a new SSH key for use with MergeTB in case you want to upload the private key to the XDC later (e.g., if you don't want to use SSH authentication forwarding).
 The exact command to generate SSH keys depends on your client operating system.
-For example, to generate a key called `id_rsa_mergetb` on macOS (and probably most Linux distributions):
+For example, to generate a key called `id_rsa_mergetb` on Linux (on macOS, consider adding the `--apple-use-keychain` option):
 
 ```sh
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_mergetb -C "foo@bar.com"
