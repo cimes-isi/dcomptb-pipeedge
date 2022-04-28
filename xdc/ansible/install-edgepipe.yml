@@ -34,8 +34,6 @@
       - { url: 'https://storage.googleapis.com/vit_models/imagenet21k/ViT-H_14.npz', file: 'ViT-H_14.npz' }
     run_once: true
 
-  # TODO: need DeiT and BERT models, too
-
   - name: Install apt dependencies
     become: yes
     apt:
@@ -70,12 +68,6 @@
   - name: Compile scheduler
     command: cmake --build "{{ scheduler_build_dir }}" -j
     when: source.changed
-
-  - name: Copy models from controller to hosts
-    ansible.builtin.copy:
-      src: "{{ models_dir_local }}/"
-      dest: "{{ models_dir }}/"
-      force: no
 
   # TODO: too many problems with pip module...
   # - name: Create Python virtualenv
@@ -112,3 +104,27 @@
       pip install -e "{{ fogsys_int_source_dir }}"
     args:
       executable: /bin/bash
+
+  - name: Copy ViT models from controller to hosts
+    ansible.builtin.copy:
+      src: "{{ models_dir_local }}/"
+      dest: "{{ models_dir }}/"
+      force: no
+
+  - name: Cache BERT models
+    shell: |
+      source "{{ venv_dir }}/bin/activate" && \
+      python3 "{{ source_dir }}/tools/bert_save_weights.py"
+    args:
+      chdir: "{{ models_dir }}"
+      executable: /bin/bash
+      creates: "{{ models_dir }}/BERT-L.npz"
+
+  - name: Cache DeiT models
+    shell: |
+      source "{{ venv_dir }}/bin/activate" && \
+      python3 "{{ source_dir }}/tools/deit_save_weights.py"
+    args:
+      chdir: "{{ models_dir }}"
+      executable: /bin/bash
+      creates: "{{ models_dir }}/DeiT_T_distilled.npz"
