@@ -66,9 +66,11 @@ Now install custom dependencies (NOTE: there is a partial ordering for these scr
 ansible-playbook install-msr-safe.yml
 ansible-playbook install-raplcap.yml
 ansible-playbook install-energymon.yml
-ansible-playbook install-cnpy.yml
 ansible-playbook install-edgepipe.yml
 ```
+
+Note: When installing EdgePipe, the task "Copy models from controller to hosts" may be slow, which increases the chances of the SSH connection being interrupted/reset (Ansible fails with "unreachable" status for host).
+If this occurs, ensure the failed host is still alive and re-run the script until it is successful.
 
 
 ## Initialize Worker Environment
