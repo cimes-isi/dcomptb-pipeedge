@@ -54,10 +54,6 @@
       version: "{{ version }}"
     register: source
 
-  - name: Compile partition (legacy)
-    when: source.changed
-    shell: g++ "{{ source_dir }}/partition/partition.cpp" -o "{{ source_dir }}/partition/partition" -O2 -L/usr/local -lcnpy -lz --std=c++17
-
   - name: Create scheduler build directory
     command: cmake -S "{{ source_dir }}/partition" -B "{{ scheduler_build_dir }}" \
                    -DCMAKE_BUILD_TYPE=RelWithDebInfo
