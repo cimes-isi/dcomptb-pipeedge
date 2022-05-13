@@ -4,8 +4,7 @@
   vars:
     source_dir: energymon
     build_dir: "{{source_dir}}/_build"
-    # TODO: use v0.5.0 once released w/ jetson support (for consistency w/ CHI@Edge)
-    version: v0.4.0
+    version: v0.5.0
     shared_libs: ON
     build_type: RelWithDebInfo
     energymon_default: energymon-raplcap-msr
