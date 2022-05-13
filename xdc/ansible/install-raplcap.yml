@@ -4,8 +4,7 @@
   vars:
     source_dir: raplcap
     build_dir: "{{source_dir}}/_build"
-    # TODO: use v0.8.0 once released with SILVERMONT_D energy fix
-    version: master
+    version: v0.8.0
     shared_libs: ON
     build_type: RelWithDebInfo
 
