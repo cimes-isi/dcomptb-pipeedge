@@ -93,10 +93,11 @@
 
   - name: Update Python virtualenv
     when: source.changed or fogsys_int_source.changed or virtualenv.changed
+    # --no-cache-dir needed due to memory constraints on MinnowBoards
     shell: |
       source "{{ venv_dir }}/bin/activate" && \
       pip install -U pip && \
-      pip install -r "{{ source_dir }}/requirements.txt" && \
+      pip install -r "{{ source_dir }}/requirements.txt" --no-cache-dir && \
       pip uninstall -y fogsys_integration && \
       pip install -e "{{ fogsys_int_source_dir }}"
     args:
