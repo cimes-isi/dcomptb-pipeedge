@@ -89,9 +89,10 @@
     command: python3 -m venv "{{ venv_dir }}"
     args:
       creates: "{{ venv_dir }}"
+    register: virtualenv
 
   - name: Update Python virtualenv
-    when: source.changed or fogsys_int_source.changed
+    when: source.changed or fogsys_int_source.changed or virtualenv.changed
     shell: |
       source "{{ venv_dir }}/bin/activate" && \
       pip install -U pip && \
