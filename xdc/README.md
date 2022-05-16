@@ -67,6 +67,7 @@ ansible-playbook install-msr-safe.yml
 ansible-playbook install-raplcap.yml
 ansible-playbook install-energymon.yml
 ansible-playbook install-edgepipe.yml
+ansible-playbook install-edgepipe-models.yml
 ```
 
 Note: When installing EdgePipe, the task "Copy models from controller to hosts" may be slow, which increases the chances of the SSH connection being interrupted/reset (Ansible fails with "unreachable" status for host).
