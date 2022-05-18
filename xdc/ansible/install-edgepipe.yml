@@ -53,7 +53,7 @@
     shell: |
       source "{{ venv_dir }}/bin/activate" && \
       pip install -U pip && \
-      pip uninstall -y edgepipe
-      pip install -e "{{ source_dir }}" -v --no-cache-dir"
+      pip uninstall -y edgepipe && \
+      pip install -e "{{ source_dir }}" -v --no-cache-dir
     args:
       executable: /bin/bash
