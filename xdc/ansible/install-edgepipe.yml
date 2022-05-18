@@ -6,8 +6,6 @@
     source_dir: "{{ ansible_env.HOME }}/EdgePipe"
     version: fogsys_integration
     venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
-    fogsys_int_source_dir: "{{ ansible_env.HOME }}/fogsys_integration"
-    fogsys_int_version: master
 
   tasks:
 
@@ -43,14 +41,6 @@
   #     virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
   #     requirements: "{{ ansible_env.HOME }}/{{ source_dir }}/requirements.txt"
 
-  - name: Fetch fogsys_integration development source
-    ansible.builtin.git:
-      accept_hostkey: yes
-      repo: 'git@github.com:cimes-isi/fogsys_integration.git'
-      dest: "{{ fogsys_int_source_dir }}"
-      version: "{{ fogsys_int_version }}"
-    register: fogsys_int_source
-
   - name: Create Python virtualenv
     command: python3 -m venv "{{ venv_dir }}"
     args:
@@ -58,14 +48,12 @@
     register: virtualenv
 
   - name: Update Python virtualenv
-    when: source.changed or fogsys_int_source.changed or virtualenv.changed
+    when: source.changed or virtualenv.changed
     # --no-cache-dir needed due to memory constraints on MinnowBoards
     shell: |
       source "{{ venv_dir }}/bin/activate" && \
       pip install -U pip && \
       pip uninstall -y edgepipe
-      pip install -e "{{ source_dir }}" -v --no-cache-dir && \
-      pip uninstall -y fogsys_integration && \
-      pip install -e "{{ fogsys_int_source_dir }}"
+      pip install -e "{{ source_dir }}" -v --no-cache-dir"
     args:
       executable: /bin/bash
