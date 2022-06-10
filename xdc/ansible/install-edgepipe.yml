@@ -4,7 +4,7 @@
   vars:
     # ansible_python_interpreter: /usr/bin/python3
     source_dir: "{{ ansible_env.HOME }}/EdgePipe"
-    version: fogsys_integration
+    version: main
     venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
 
   tasks:
