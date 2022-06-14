@@ -3,6 +3,7 @@
 
   vars:
     # ansible_python_interpreter: /usr/bin/python3
+    repo: "git@github.com:cimes-isi/EdgePipe.git"
     source_dir: "{{ ansible_env.HOME }}/EdgePipe"
     version: main
     venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
@@ -24,7 +25,7 @@
   - name: Fetch source
     ansible.builtin.git:
       accept_hostkey: yes
-      repo: 'git@github.com:cimes-isi/EdgePipe.git'
+      repo: "{{ repo }}"
       dest: "{{ source_dir }}"
       version: "{{ version }}"
     register: source
