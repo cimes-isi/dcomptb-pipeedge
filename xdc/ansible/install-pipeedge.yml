@@ -3,7 +3,7 @@
 
   vars:
     # ansible_python_interpreter: /usr/bin/python3
-    repo: "git@github.com:ISI-apex/PipeEdge.git"
+    repo: "https://github.com/usc-isi/PipeEdge.git"
     source_dir: "{{ ansible_env.HOME }}/PipeEdge"
     version: main
     venv_dir: "{{ ansible_env.HOME }}/venv-PipeEdge"
