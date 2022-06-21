@@ -1,12 +1,12 @@
-- name: Install EdgePipe
+- name: Install PipeEdge models
   hosts: all
 
   vars:
     # ansible_python_interpreter: /usr/bin/python3
-    source_dir: "{{ ansible_env.HOME }}/EdgePipe"
-    models_dir_local: /tmp/edgepipe/models
+    source_dir: "{{ ansible_env.HOME }}/PipeEdge"
+    models_dir_local: /tmp/pipeedge/models
     models_dir: "{{ ansible_env.HOME }}/models"
-    venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
+    venv_dir: "{{ ansible_env.HOME }}/venv-PipeEdge"
 
   tasks:
 

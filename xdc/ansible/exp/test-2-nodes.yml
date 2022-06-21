@@ -1,12 +1,12 @@
-- name: EdgePipe 2-node test
+- name: PipeEdge 2-node test
   hosts: rcc-0, rcc-1
 
   vars:
     fail_if_test_dir_exists: true
 
     # device configurations
-    source_dir: "{{ ansible_env.HOME }}/EdgePipe"
-    venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
+    source_dir: "{{ ansible_env.HOME }}/PipeEdge"
+    venv_dir: "{{ ansible_env.HOME }}/venv-PipeEdge"
     test_dir: "{{ ansible_env.HOME }}/test-2-nodes"
     world_size: "{{ ansible_play_hosts | length }}"
     master_host: "{{ ansible_play_hosts[0] }}"

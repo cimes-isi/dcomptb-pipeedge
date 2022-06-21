@@ -40,13 +40,13 @@ ssh-add ~/.ssh/id_rsa_mergetb
 ## Experiment Setup
 
 Create an experiment, realize it, then materialize it.
-For example, create an experiment called `edgepipe` using the specified `mergexp` Python source file, then a realization called `realization1`:
+For example, create an experiment called `pipeedge` using the specified `mergexp` Python source file, then a realization called `realization1`:
 
 ```sh
-mergetb new exp edgepipe --src ../models/8-MB-8-RCC.py
-mergetb realize edgepipe realization1 --accept
-mergetb materialize edgepipe realization1
-mergetb wait materialize edgepipe realization1
+mergetb new exp pipeedge --src ../models/8-MB-8-RCC.py
+mergetb realize pipeedge realization1 --accept
+mergetb materialize pipeedge realization1
+mergetb wait materialize pipeedge realization1
 ```
 
 Note: Waiting for materialization may take several minutes.
@@ -54,7 +54,7 @@ Note: Waiting for materialization may take several minutes.
 Now create an Experiment Development Container (XDC) called `xdc1`:
 
 ```sh
-mergetb new xdc edgepipe xdc1
+mergetb new xdc pipeedge xdc1
 ```
 
 
@@ -65,13 +65,13 @@ If you are using Ubuntu Linux, see the [MergeTB docs on XDC Access](https://www.
 Otherwise, to SSH to the XDC, substitute your personal project name (probably the same as your MergeTB username) for `<project>`:
 
 ```sh
-ssh -i ~/.ssh/id_rsa_mergetb -A -J jumpc.mergetb.io:2202 xdc1-edgepipe-<project>
+ssh -i ~/.ssh/id_rsa_mergetb -A -J jumpc.mergetb.io:2202 xdc1-pipeedge-<project>
 ```
 
 Optional: Upload the private key to the XDC (we recommended creating a unique SSH key specifically for this):
 
 ```sh
-scp -i ~/.ssh/id_rsa_mergetb -o ProxyJump=jumpc.mergetb.io:2202 ~/.ssh/id_rsa_mergetb xdc1-edgepipe-<project>:.ssh/id_rsa
+scp -i ~/.ssh/id_rsa_mergetb -o ProxyJump=jumpc.mergetb.io:2202 ~/.ssh/id_rsa_mergetb xdc1-pipeedge-<project>:.ssh/id_rsa
 ```
 
 You can then drop the `-A` option when connecting to the XDC with `ssh`.
@@ -82,13 +82,13 @@ You can then drop the `-A` option when connecting to the XDC with `ssh`.
 Free resources:
 
 ```sh
-mergetb delete xdc edgepipe xdc1
-mergetb dematerialize edgepipe realization1
-mergetb wait dematerialize edgepipe realization1
-mergetb free edgepipe realization1
+mergetb delete xdc pipeedge xdc1
+mergetb dematerialize pipeedge realization1
+mergetb wait dematerialize pipeedge realization1
+mergetb free pipeedge realization1
 # wait may not be needed - you may safely ignore "Not Found" / 404 errors
-mergetb wait free edgepipe realization1
-mergetb delete experiment edgepipe
+mergetb wait free pipeedge realization1
+mergetb delete experiment pipeedge
 ```
 
 Note: Waiting for dematerialization may take several minutes.

@@ -1,12 +1,12 @@
-- name: Install EdgePipe
+- name: Install PipeEdge
   hosts: all
 
   vars:
     # ansible_python_interpreter: /usr/bin/python3
-    repo: "git@github.com:cimes-isi/EdgePipe.git"
-    source_dir: "{{ ansible_env.HOME }}/EdgePipe"
+    repo: "git@github.com:ISI-apex/PipeEdge.git"
+    source_dir: "{{ ansible_env.HOME }}/PipeEdge"
     version: main
-    venv_dir: "{{ ansible_env.HOME }}/venv-EdgePipe"
+    venv_dir: "{{ ansible_env.HOME }}/venv-PipeEdge"
 
   tasks:
 
@@ -36,8 +36,8 @@
   #     # need latest for dependencies to correctly compile
   #     state: latest
   #     # this must be a full path, o/w it creates in /tmp and we get other seemingly unrelated python errors
-  #     # keep outside of the EdgePipe directory so we can manage them independently, if needed
-  #     virtualenv: "{{ ansible_env.HOME }}/venv-EdgePipe"
+  #     # keep outside of the PipeEdge directory so we can manage them independently, if needed
+  #     virtualenv: "{{ ansible_env.HOME }}/venv-PipeEdge"
   #     # virtualenv_python: "{{ ansible_python_interpreter }}"
   #     virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
   #     requirements: "{{ ansible_env.HOME }}/{{ source_dir }}/requirements.txt"
@@ -54,7 +54,7 @@
     shell: |
       source "{{ venv_dir }}/bin/activate" && \
       pip install -U pip && \
-      pip uninstall -y edgepipe && \
+      pip uninstall -y pipeedge && \
       pip install -e "{{ source_dir }}[tools]" -v --no-cache-dir
     args:
       executable: /bin/bash

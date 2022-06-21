@@ -1,4 +1,4 @@
-# DCompTB Experiment Scripts for EdgePipe
+# DCompTB Experiment Scripts for PipeEdge
 
 ## Configure the Experiment Development Container (XDC)
 
@@ -6,7 +6,7 @@ Login and attach to the experiment realization, substituting your username and p
 
 ```sh
 xdc login <username>
-xdc attach <project> edgepipe realization1
+xdc attach <project> pipeedge realization1
 ```
 
 Configure `~/.ssh/known_hosts` with:
@@ -40,8 +40,8 @@ sudo apt-get install -y git
 Fetch this repository and change to its `xdc/ansible/` directory:
 
 ```sh
-git clone https://github.com/cimes-isi/dcomptb-edgepipe.git
-cd dcomptb-edgepipe/xdc/ansible/
+git clone https://github.com/cimes-isi/dcomptb-pipeedge.git
+cd dcomptb-pipeedge/xdc/ansible/
 ```
 
 
@@ -60,17 +60,17 @@ If this is your initial setup and the task "Reboot if required" is skipped, then
 ansible all -b -m reboot
 ```
 
-Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`, `edgepipe` depends on `cnpy`):
+Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`, `pipeedge` depends on `cnpy`):
 
 ```sh
 ansible-playbook install-msr-safe.yml
 ansible-playbook install-raplcap.yml
 ansible-playbook install-energymon.yml
-ansible-playbook install-edgepipe.yml
-ansible-playbook install-edgepipe-models.yml
+ansible-playbook install-pipeedge.yml
+ansible-playbook install-pipeedge-models.yml
 ```
 
-Note: When installing EdgePipe, the task "Copy models from controller to hosts" may be slow, which increases the chances of the SSH connection being interrupted/reset (Ansible fails with "unreachable" status for host).
+Note: When installing PipeEdge, the task "Copy models from controller to hosts" may be slow, which increases the chances of the SSH connection being interrupted/reset (Ansible fails with "unreachable" status for host).
 If this occurs, ensure the failed host is still alive and re-run the script until it is successful.
 
 
@@ -93,7 +93,7 @@ Test that RAPL energy monitoring is working properly:
 ansible all -a rapl-configure-msr
 ```
 
-Test a distributed EdgePipe execution (should take about 2 minutes):
+Test a distributed PipeEdge execution (should take about 2 minutes):
 
 ```sh
 ansible-playbook exp/test-2-nodes.yml --extra-vars "fail_if_test_dir_exists=false"

@@ -1,4 +1,4 @@
-# Distributed Computing Testbed - EdgePipe Scripts
+# Distributed Computing Testbed - PipeEdge Scripts
 
 Login at: https://launch.mergetb.net/
 
