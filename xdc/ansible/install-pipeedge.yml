@@ -55,6 +55,6 @@
       source "{{ venv_dir }}/bin/activate" && \
       pip install -U pip && \
       pip uninstall -y pipeedge && \
-      pip install -e "{{ source_dir }}[tools]" -v --no-cache-dir
+      pip install -e "{{ source_dir }}[runtime]" -v --no-cache-dir
     args:
       executable: /bin/bash
