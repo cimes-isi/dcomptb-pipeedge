@@ -34,6 +34,7 @@ ansible all -a hostname
 Install XDC package dependencies:
 
 ```sh
+sudo apt-get update
 sudo apt-get install -y git
 ```
 
