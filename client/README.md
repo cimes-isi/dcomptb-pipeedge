@@ -4,7 +4,7 @@
 
 You must must have an account on [MergeTB](https://launch.mergetb.net/) with access to the [Distributed Computing Testbed](https://www.dcomptb.net/).
 
-Download `mergetb` (not `mergexp`) as linked from the [MergeTB docs](https://www.mergetb.org/docs/cli).
+Download `mergetb` (not `mergexp`) as linked from the [MergeTB docs](https://prev.mergetb.org/docs/cli).
 Then login, substituting your user name for `<username>`:
 
 ```sh
@@ -22,7 +22,7 @@ ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_mergetb -C "foo@bar.com"
 ```
 
 The `-C <comment>` option is useful if you intended to work with `git` on the testbed (substitute with your own email address), but it is optional.
-You will be prompted for a passphrase - the [MergeTB docs](https://www.mergetb.org/docs/web/#add-your-public-key) recommend using a passphrase, but this is also optional (we do not).
+You will be prompted for a passphrase - the [MergeTB docs](https://prev.mergetb.org/docs/web/#add-your-public-key) recommend using a passphrase, but this is also optional (we do not).
 
 Now add your public key MergeTB:
 
@@ -60,7 +60,7 @@ mergetb new xdc pipeedge xdc1
 
 ## SSH to the XDC
 
-If you are using Ubuntu Linux, see the [MergeTB docs on XDC Access](https://www.mergetb.org/docs/xdc-access) (probably not an issue if your Ubuntu version is >= 18.04 LTS (Bionic Beaver)).
+If you are using Ubuntu Linux, see the [MergeTB docs on XDC Access](https://prev.mergetb.org/docs/xdc-access) (probably not an issue if your Ubuntu version is >= 18.04 LTS (Bionic Beaver)).
 
 Otherwise, to SSH to the XDC, substitute your personal project name (probably the same as your MergeTB username) for `<project>`:
 
