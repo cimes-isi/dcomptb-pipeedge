@@ -54,6 +54,26 @@ cd dcomptb-pipeedge/xdc/ansible/
 ```
 
 
+## Download and Deploy Models
+
+To fetch models, we need a copy of PipeEdge on the XDC, although it won't be used in pipelines.
+Fetching models sometimes requires loading them, and some are too big to load in their entirety on some worker nodes (hence the need for PipeEdge):
+
+```sh
+ansible-playbook --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 install-pipeedge.yml
+ansible-playbook --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 fetch-pipeedge-models.yml
+```
+
+Now deploy models to workers (one worker at a time to try and reduce connection timeouts and network thrashing):
+
+```sh
+ansible-playbook -f 1 deploy-pipeedge-models.yml
+```
+
+Note: Ansible often fails with "unreachable" status for host when deploying models.
+If this occurs, ensure the failed host is still alive and re-run the script as-needed.
+
+
 ## Install Worker Dependencies
 
 Update package dependencies:
@@ -69,18 +89,14 @@ If this is your initial setup and the task "Reboot if required" is skipped, then
 ansible all -b -m reboot
 ```
 
-Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`, `pipeedge` depends on `cnpy`):
+Now install custom dependencies (NOTE: there is a partial ordering for these scripts, e.g., `energymon` depends on `raplcap`):
 
 ```sh
 ansible-playbook install-msr-safe.yml
 ansible-playbook install-raplcap.yml
 ansible-playbook install-energymon.yml
 ansible-playbook install-pipeedge.yml
-ansible-playbook install-pipeedge-models.yml
 ```
-
-Note: When installing PipeEdge, the task "Copy models from controller to hosts" may be slow, which increases the chances of the SSH connection being interrupted/reset (Ansible fails with "unreachable" status for host).
-If this occurs, ensure the failed host is still alive and re-run the script until it is successful.
 
 
 ## Initialize Worker Environment

@@ -1,0 +1,39 @@
+- name: Fetch PipeEdge models
+  hosts: all
+
+  vars:
+    source_dir: "{{ ansible_env.HOME }}/PipeEdge"
+    models_dir: "{{ ansible_env.HOME }}/models"
+    venv_dir: "{{ ansible_env.HOME }}/venv-PipeEdge"
+
+  tasks:
+
+  - name: Create models directory
+    file:
+      path: "{{ models_dir }}"
+      state: directory
+
+  - name: Fetch models
+    shell: |
+      source "{{ venv_dir }}/bin/activate" && \
+      python3 "{{ source_dir }}/save_model_weights.py" -m {{ item.model }}
+    args:
+      chdir: "{{ models_dir }}"
+      executable: /bin/bash
+      creates: "{{ item.file }}"
+    loop:
+      # DeiT
+      - { model: 'facebook/deit-base-distilled-patch16-224', file: 'DeiT_B_distilled.npz' }
+      - { model: 'facebook/deit-small-distilled-patch16-224', file: 'DeiT_S_distilled.npz' }
+      - { model: 'facebook/deit-tiny-distilled-patch16-224', file: 'DeiT_T_distilled.npz' }
+      # BERT
+      - { model: 'bert-base-uncased', file: 'BERT-B.npz' }
+      # As it turns out, XDCs are limited by default to 2 GB, but exceptions can be requested.
+      # Otherwise exceeding this limit causes the process to be killed.
+      # We'll just skip BERT-L for now since it exceeds this limit.
+      # - { model: 'bert-large-uncased', file: 'BERT-L.npz' }
+      - { model: 'textattack/bert-base-uncased-CoLA', file: 'BERT-B-CoLA.npz' }
+      # ViT
+      - { model: 'google/vit-base-patch16-224', file: 'ViT-B_16-224.npz' }
+      - { model: 'google/vit-large-patch16-224', file: 'ViT-L_16-224.npz' }
+      - { model: 'google/vit-huge-patch14-224-in21k', file: 'ViT-H_14.npz' }

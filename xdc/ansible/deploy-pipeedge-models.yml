@@ -1,0 +1,15 @@
+- name: Deploy PipeEdge models
+  hosts: all
+
+  vars:
+    models_dir_local: "{{ lookup('env', 'HOME') }}/models"
+    models_dir: "{{ ansible_env.HOME }}/models"
+
+  tasks:
+
+  - name: Deploy models to workers
+    ansible.builtin.copy:
+      src: "{{ models_dir_local }}/"
+      dest: "{{ models_dir }}/"
+      force: no
+    retries: 10
