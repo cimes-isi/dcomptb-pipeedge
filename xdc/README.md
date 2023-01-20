@@ -38,6 +38,14 @@ sudo apt-get update
 sudo apt-get install -y git
 ```
 
+If `apt-get update` prints a GPG error for mergetb repositories, you can safely ignore the message -- this repository is only used for the `mergetb` package, and no updates are expected for it.
+However, if it bothers you, get the latest GPG key and retry:
+
+```sh
+curl -L https://pkg.mergetb.net/gpg | sudo apt-key --keyring /etc/apt/trusted.gpg.d/mergetb.gpg add -
+sudo apt-get update
+```
+
 Fetch this repository and change to its `xdc/ansible/` directory:
 
 ```sh
