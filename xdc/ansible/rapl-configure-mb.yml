@@ -1,0 +1,39 @@
+- name: Configure RAPL (Minnowboard devices only)
+  hosts: mb-*
+
+  # Requires that RAPLCap is installed and msr-safe is loaded
+
+  # We usually find that setting the RAPL package zone's short term power
+  # constraint produces good performance/power tradeoffs on most CPUs.
+  # The Minnowboard's Intel Atom E3845 CPUs seem quirky though.
+  # First, their PACKAGE zone only supports one constraint -- LONG.
+  # Additionally, configuring it doesn't seem to have any effect by default.
+  # The only other zone is CORE, which is disabled by default.
+  # Only by enabling the CORE zone does the PACKAGE zone configuration seem to
+  # have any effect.
+  # Therefore, the RAPL configuration approach here is somewhat unusual.
+
+  vars:
+    enable: 0 # 1 to enable, 0 to disable (CORE disabled by default)
+    time_window_s: 28 # PACKAGE defaults to 28, CORE defaults to 1
+    power_limit_w: 8 # PACKAGE defaults to 8, CORE defaults to 0 (undefined?)
+
+  tasks:
+
+  - name: Enable (1) or Disable (0) RAPL CORE configuration - {{ enable }}
+    # become: yes
+    command: rapl-configure-msr -z CORE -e "{{ enable }}"
+
+  - name: Set RAPL PACKAGE configuration
+    # become: yes
+    # PACKAGE can't be disabled
+    command: rapl-configure-msr -z PACKAGE -l LONG \
+             -t "{{ time_window_s }}" -p "{{ power_limit_w }}"
+
+  - name: Get RAPL PACKAGE configuration
+    # become: yes
+    command: rapl-configure-msr -z PACKAGE
+    register: rapl_pkg_cfg
+
+  - name: Print RAPL PACKAGE configuration
+    debug: var=rapl_pkg_cfg.stdout_lines
