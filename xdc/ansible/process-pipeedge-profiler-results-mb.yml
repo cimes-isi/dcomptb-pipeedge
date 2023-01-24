@@ -1,0 +1,33 @@
+- name: Process PipeEdge profiler results
+  hosts: mb-*
+
+  vars:
+    process_model: True
+    venv_dir: "{{ ansible_env.HOME }}/venv-PipeEdge"
+    source_dir: "{{ ansible_env.HOME }}/PipeEdge"
+    results_yml: "profiler_results.yml"
+    models_yml: "models.yml"
+    device_types_yml: "device_types.yml"
+    dev_type: "MB"
+    dev_type_mem: 2048
+    dev_type_bw: 1000
+
+  tasks:
+
+  - name: Process models YAML
+    shell: |
+      source "{{ venv_dir }}/bin/activate" && \
+      python3 "{{ source_dir }}/profiler_results_to_models.py" \
+        -i "{{ results_yml }}" -o "{{ models_yml }}"
+    args:
+      executable: /bin/bash
+    when: process_model | bool
+
+  - name: Process device types YAML
+    shell: |
+      source "{{ venv_dir }}/bin/activate" && \
+      python3 "{{ source_dir }}/profiler_results_to_device_types.py" \
+        "{{ dev_type }}" -dtm "{{ dev_type_mem }}" -dtb "{{ dev_type_bw }}" \
+        -i "{{ results_yml }}" -o "{{ device_types_yml }}"
+    args:
+      executable: /bin/bash
