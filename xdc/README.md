@@ -123,3 +123,17 @@ Test a distributed PipeEdge execution (should take about 2 minutes):
 ```sh
 ansible-playbook exp/test-2-nodes.yml --extra-vars "fail_if_test_dir_exists=false"
 ```
+
+
+## Device Model Profiling
+
+NOTE: Our _realization_ uses name format `mb-X` for Minnowboard devices and `rcc-X` for RCC-VE devices, where `X >= 0`.
+
+The [exp/profile-pipeedge-model.yml](./ansible/exp/profile-pipeedge-model.yml) playbook demonstrates profiling the ViT-Base model, but also exposes variables so it can be used for other models (e.g., to specify the model name, model weights file, and results YAML file).
+Additionally, profiling only needs to be run on a single host of each device type (e.g., only a single Minnowboard or a single RCC-VE device).
+
+Profiling results need to be processed into scheduler-compatible YAML files before PipeEdge can use them.
+The [exp/process-pipeedge-profiler-results-mb.yml](./ansible/exp/process-pipeedge-profiler-results-mb.yml) playbook performs these steps, and is also configurable using variables.
+
+For a _reference_ example in using these playbooks, see the [exp/profile-pipeedge-models-mb.sh](./ansible/exp/profile-pipeedge-models-mb.sh) shell script.
+This script profiles three ViT models on a Minnowboard device `mb-0` under different RAPL power caps, processes them, collects the scheduler-compatible YAML files, then deploys those files to all Minnowboard hosts.
