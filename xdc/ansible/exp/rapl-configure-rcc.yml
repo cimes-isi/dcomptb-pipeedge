@@ -1,0 +1,31 @@
+- name: Configure RAPL (RCC-VE devices only)
+  hosts: rcc-*
+
+  # Requires that RAPLCap is installed and msr-safe is loaded
+
+  # NOTE: this doesn't actually work!
+  # The RCC-VE's Intel Atom C2558 CPUs aren't actually changing RAPL power caps.
+  # We contacted Silicom Support in July 2021 but did not resolve the issue.
+  # This script is included only for posterity/reference.
+
+  vars:
+    zone: PACKAGE # CORE is also supported, but disabled by default
+    enable: 1
+    constraint: SHORT
+    power_limit_w: 18 # default
+
+  tasks:
+
+  - name: Set RAPL configuration
+    become: yes
+    command: rapl-configure-msr -z "{{ zone }}" \
+             -e "{{ enable }}" -l "{{ constraint }}" \
+             -p "{{ power_limit_w }}"
+
+  - name: Get RAPL configuration
+    become: yes
+    command: rapl-configure-msr -z "{{ zone }}"
+    register: rapl_config
+
+  - name: Print RAPL configuration
+    debug: var=rapl_config.stdout_lines
