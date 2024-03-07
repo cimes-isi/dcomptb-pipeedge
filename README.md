@@ -1,6 +1,6 @@
-# Distributed Computing Testbed - PipeEdge Scripts
+# Dispersed Computing Testbed - PipeEdge Scripts
 
-This repository contains documentation and scripts for running [PipeEdge](https://github.com/usc-isi/PipeEdge) experiments on the [Distributed Computing Testbed](https://www.dcomptb.net/).
+This repository contains documentation and scripts for running [PipeEdge](https://github.com/usc-isi/PipeEdge) experiments on the [Dispersed Computing Testbed](https://www.dcomptb.net/).
 
 Directory structure:
 
